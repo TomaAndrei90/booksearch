@@ -1,0 +1,112 @@
+import React, { Component } from 'react'
+import { Menu, Container, Image, Form, Card } from 'semantic-ui-react';
+import LoaderWithText from './LoaderWithText';
+import logo from './book.svg';
+
+export class BookSearch extends Component {
+  state = {
+    loading: false,
+    books: undefined,
+    search: '',
+  }
+
+  fetchBooks = async (e) => {
+    e.preventDefault();
+    this.setState({
+      loading: true
+    })
+    const searchTerms = this.state.search;
+    const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${searchTerms}`);
+    const jsonResponse = await response.json();
+    this.setState({
+      loading: false,
+      books: jsonResponse
+    })
+  }
+
+  changeInputHandler = e => {
+    this.setState({
+      search: e.target.value
+    })
+  }
+
+  render() {
+
+    const { books, search, loading } = this.state;
+
+    const booksInfo = (books && books.items) ?
+    <Card.Group centered itemsPerRow={5} stackable={true}  style={{margin: '0 1rem', paddingTop: '6rem'}}>
+      {books.items.map(item => {
+        const info = item.volumeInfo;
+        const {
+          title = 'No title data.',
+          authors = ['No author data.'],
+          description = '',
+          imageLinks = '',
+          infoLink = '',
+          publishedDate,
+          publisher,
+        } = info;
+
+        return (
+          <Card href={infoLink} color="brown">
+            <Image wrapped src={imageLinks.thumbnail} />
+            <Card.Content>
+              <Card.Header>{title}</Card.Header>
+              <Card.Meta>{authors.join(' / ')}</Card.Meta>
+              <Card.Description>{description}</Card.Description>
+            </Card.Content>
+            <Card.Content extra>
+              {publishedDate && publisher && <p>{`Published ${publishedDate && `on ${publishedDate}`} ${publisher && `on ${publisher}`}`}</p>}
+            </Card.Content>
+          </Card>
+        )
+      })}
+    </Card.Group> : 
+    <div style={{ paddingTop: '6rem', minHeight: '90vh', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around' }}>
+      <h2 style={{ alignSelf: 'center' }}>No results to show.</h2>
+    </div>;
+    
+
+    return (
+      <>
+        <Menu borderless fixed="top">
+          <Container>
+            <Menu.Item>
+              <Image size="mini" src={logo} />
+            </Menu.Item>
+            <Menu.Item header>BookSearch</Menu.Item>
+            <Menu.Item position="right">
+              <Form onSubmit={this.fetchBooks}>
+                <Form.Group>
+                  <Form.Input
+                    placeholder="Search for..."
+                    type="search"
+                    name="search"
+                    action={{
+                      color: 'brown',
+                      content: 'Search',
+                      icon: 'search'
+                    }}
+                    value={search}
+                    onChange={this.changeInputHandler} />
+                </Form.Group>
+              </Form>
+            </Menu.Item>
+          </Container>
+        </Menu>
+
+        { loading ?
+          <div style={{ paddingTop: '6rem', minHeight: '90vh', display: 'flex', alignItems: 'center' }}>
+            <LoaderWithText text="Loading..." />
+          </div> :
+          booksInfo
+
+        }
+        <div style={{textAlign: 'right', paddingRight: '1rem'}}>Icons made by <a href="https://www.flaticon.com/authors/dinosoftlabs" title="DinosoftLabs">DinosoftLabs</a> from <a href="https://www.flaticon.com/"             title="Flaticon">www.flaticon.com</a></div>
+      </>
+    )
+  }
+}
+
+export default BookSearch
