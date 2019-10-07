@@ -8,6 +8,7 @@ export class BookSearch extends Component {
     loading: false,
     books: undefined,
     search: '',
+    ww: window.innerWidth,
   }
 
   fetchBooks = async (e) => {
@@ -30,9 +31,17 @@ export class BookSearch extends Component {
     })
   }
 
+  handleWindowSizeChange = () => {
+    this.setState({ ww: window.innerWidth });
+  };
+  
+  componentDidMount = () => {
+    window.addEventListener('resize', this.handleWindowSizeChange);
+  }
+
   render() {
 
-    const { books, search, loading } = this.state;
+    const { books, search, loading, ww } = this.state;
 
     const booksInfo = (books && books.items) ?
     <Card.Group centered itemsPerRow={5} stackable={true}  style={{margin: '0 1rem', paddingTop: '6rem'}}>
@@ -75,17 +84,19 @@ export class BookSearch extends Component {
             <Menu.Item>
               <Image size="mini" src={logo} />
             </Menu.Item>
-            <Menu.Item header>BookSearch</Menu.Item>
+            { ww >= 400 && <Menu.Item header>BookSearch</Menu.Item> }
             <Menu.Item position="right">
-              <Form onSubmit={this.fetchBooks}>
+              <Form size={ ww >= 500 ? 'medium' : 'mini'} onSubmit={this.fetchBooks}>
                 <Form.Group>
                   <Form.Input
-                    placeholder="Search for..."
+                    placeholder="Search for Books..."
                     type="search"
                     name="search"
-                    action={{
+                    action={
+                      
+                      {
                       color: 'brown',
-                      content: 'Search',
+                      content: ww >= 500 ? 'Search' : null,
                       icon: 'search'
                     }}
                     value={search}
