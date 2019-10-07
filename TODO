@@ -1,0 +1,3 @@
+☐ de adaugat rating (volumeInfo.averageRating)
+☐ de schimbat cardul sa fie imaginea in stanga si textul in dreapta sau invers, oricum, un layout pe laterala; poate doar pe mobil sa ramana stacked? arata urat cu spatiu gol pe langa poza cartii
+☐ de facut css-ul macar cu clase sau altceva decat stiluri inline; preferabil de folosit o tehnologie anume legata de react

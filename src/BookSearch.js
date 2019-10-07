@@ -3,6 +3,8 @@ import { Menu, Container, Image, Form, Card } from 'semantic-ui-react';
 import LoaderWithText from './LoaderWithText';
 import logo from './book.svg';
 
+const API_KEY = 'AIzaSyBTDfzdtanhLpztL7sl8eh4K6tLg8gpHz0';
+
 export class BookSearch extends Component {
   state = {
     loading: false,
@@ -17,7 +19,7 @@ export class BookSearch extends Component {
       loading: true
     })
     const searchTerms = this.state.search;
-    const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${searchTerms}`);
+    const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${searchTerms}&key=${API_KEY}`);
     const jsonResponse = await response.json();
     this.setState({
       loading: false,
@@ -47,6 +49,7 @@ export class BookSearch extends Component {
     <Card.Group centered itemsPerRow={5} stackable={true}  style={{margin: '0 1rem', paddingTop: '6rem'}}>
       {books.items.map(item => {
         const info = item.volumeInfo;
+        const id = item.id;
         const {
           title = 'No title data.',
           authors = ['No author data.'],
@@ -58,7 +61,7 @@ export class BookSearch extends Component {
         } = info;
 
         return (
-          <Card href={infoLink} color="brown">
+          <Card key={id} href={infoLink} color="brown">
             <Image wrapped src={imageLinks.thumbnail} />
             <Card.Content>
               <Card.Header>{title}</Card.Header>
@@ -86,7 +89,7 @@ export class BookSearch extends Component {
             </Menu.Item>
             { ww >= 400 && <Menu.Item header>BookSearch</Menu.Item> }
             <Menu.Item position="right">
-              <Form size={ ww >= 500 ? 'medium' : 'mini'} onSubmit={this.fetchBooks}>
+              <Form size={ ww >= 500 && 'mini'} onSubmit={this.fetchBooks}>
                 <Form.Group>
                   <Form.Input
                     placeholder="Search for Books..."
